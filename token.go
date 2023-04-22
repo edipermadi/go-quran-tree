@@ -30,9 +30,9 @@ func (t *Token) Characters() []Character {
 					Tashkeels: c.Tashkeels,
 				})
 
-				// reset parser
-				state = 0
-				c.Letter = 0
+				// clear parser expect tashkeel next
+				state = 1
+				c.Letter = v
 				c.Tashkeels = nil
 			}
 		} else if isArabicTashkeel(v) {
@@ -51,7 +51,6 @@ func (t *Token) Characters() []Character {
 				})
 
 				// reset parser
-				state = 0
 				c.Letter = 0
 				c.Tashkeels = nil
 			}
@@ -60,8 +59,7 @@ func (t *Token) Characters() []Character {
 		}
 	}
 
-	// handle leftovers
-	if len(characters) == 0 && c.Letter > 0 {
+	if c.Letter > 0 {
 		characters = append(characters, Character{
 			Letter:    c.Letter,
 			Tashkeels: c.Tashkeels,
@@ -69,6 +67,20 @@ func (t *Token) Characters() []Character {
 	}
 
 	return characters
+}
+
+func (t *Token) RemoveTashkeels() string {
+	runes := make([]rune, 0)
+	for _, v := range t.Characters() {
+		runes = append(runes, v.Letter)
+	}
+
+	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
+		runes[i], runes[j] = runes[j], runes[i]
+	}
+
+	return fmt.Sprintf("%s", string(runes))
+
 }
 
 func (t *Token) Dump() string {

@@ -6,10 +6,11 @@ import (
 	"github.com/edipermadi/go-quran-tree"
 	"github.com/stretchr/testify/require"
 	"os"
+	"strings"
 	"testing"
 )
 
-func TestToken_Characters(t *testing.T) {
+func TestToken_ParseAllCharacters(t *testing.T) {
 	file, err := os.Open("quran-uthmani.xml")
 	require.NoError(t, err)
 	defer func() { _ = file.Close() }()
@@ -36,4 +37,25 @@ func TestToken_Characters(t *testing.T) {
 	for _, v := range characters {
 		t.Logf("%s", string(v.Letter))
 	}
+}
+
+func TestToken_RemoveTashkeels(t *testing.T) {
+	file, err := os.Open("quran-uthmani.xml")
+	require.NoError(t, err)
+	defer func() { _ = file.Close() }()
+
+	// decode
+	q := &quran.Quran{}
+	require.NoError(t, xml.NewDecoder(file).Decode(q))
+
+	tokens := q.Suras[0].Ayas[0].Tokens()
+	require.NotEmpty(t, tokens)
+	t.Logf(tokens[0].Text)
+	t.Logf(tokens[0].RemoveTashkeels())
+}
+
+func TestToken_Characters(t *testing.T) {
+	token := quran.Token{Text: strings.TrimSpace("بِسْم")}
+	characters := token.Characters()
+	require.Equal(t, 3, len(characters))
 }
