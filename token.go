@@ -18,7 +18,13 @@ func (t *Token) Characters() []Character {
 
 	var c Character
 	for _, v := range t.Text {
-		if isArabicLetter(v) {
+		form, found := allRuneForms[v]
+		if !found {
+			panic(fmt.Errorf("unexpected rune 0x%04x", v))
+
+		}
+
+		if !form.Tashkeel && !form.Annotation {
 			if state == 0 {
 				// found letter while expecting letter, store and expect tashkeel
 				c.Letter = v
@@ -35,14 +41,14 @@ func (t *Token) Characters() []Character {
 				c.Letter = v
 				c.Tashkeels = nil
 			}
-		} else if isArabicTashkeel(v) {
+		} else if form.Tashkeel {
 			// accumulate tashkeels
 			if c.Tashkeels == nil {
 				c.Tashkeels = []rune{v}
 			} else {
 				c.Tashkeels = append(c.Tashkeels, v)
 			}
-		} else if isArabicAnnotation(v) {
+		} else if form.Annotation {
 			// ignore annotation accumulate letter
 			if c.Letter > 0 {
 				characters = append(characters, Character{
@@ -69,17 +75,9 @@ func (t *Token) Characters() []Character {
 	return characters
 }
 
+
 func (t *Token) RemoveTashkeels() string {
-	runes := make([]rune, 0)
-	for _, v := range t.Characters() {
-		runes = append(runes, v.Letter)
-	}
-
-	for i, j := 0, len(runes)-1; i < j; i, j = i+1, j-1 {
-		runes[i], runes[j] = runes[j], runes[i]
-	}
-
-	return fmt.Sprintf("%s", string(runes))
+	return removeTashkeels(t.Text)
 
 }
 

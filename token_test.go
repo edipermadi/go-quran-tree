@@ -3,11 +3,12 @@ package quran_test
 import (
 	"encoding/xml"
 	"fmt"
-	"github.com/edipermadi/go-quran-tree"
-	"github.com/stretchr/testify/require"
 	"os"
 	"strings"
 	"testing"
+	
+	"github.com/edipermadi/go-quran-tree"
+	"github.com/stretchr/testify/require"
 )
 
 func TestToken_ParseAllCharacters(t *testing.T) {

@@ -7,6 +7,11 @@ type Aya struct {
 	Text  string `xml:"text,attr"`
 }
 
+
+func (a *Aya) RemoveTashkeels()string{
+	return removeTashkeels(a.Text)
+}
+
 func (a *Aya) Tokens() []Token {
 	parts := strings.Fields(a.Text)
 	tokens := make([]Token, 0)

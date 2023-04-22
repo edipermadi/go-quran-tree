@@ -24,3 +24,17 @@ func TestAya_Tokens(t *testing.T) {
 		t.Logf(v.Text)
 	}
 }
+
+func TestAya_RemoveTashkeels(t *testing.T) {
+	file, err := os.Open("quran-uthmani.xml")
+	require.NoError(t, err)
+	defer func() { _ = file.Close() }()
+
+	// decode
+	q := &quran.Quran{}
+	require.NoError(t, xml.NewDecoder(file).Decode(q))
+
+	for _, v := range q.Suras[0].Ayas {
+		t.Logf(v.RemoveTashkeels())
+	}
+}
